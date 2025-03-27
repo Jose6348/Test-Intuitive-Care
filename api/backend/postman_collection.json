@@ -1,0 +1,163 @@
+{
+  "info": {
+    "_postman_id": "1234567-89ab-cdef-0123-456789abcdef",
+    "name": "Teste Intuitive Care - Operadoras ANS",
+    "description": "Coleção para testar a API de busca de operadoras da ANS",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Buscar Operadoras",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8002/api/search?query=unimed",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8002",
+          "path": [
+            "api",
+            "search"
+          ],
+          "query": [
+            {
+              "key": "query",
+              "value": "unimed",
+              "description": "Termo de busca (pode ser nome, razão social, registro ANS, CNPJ, etc)"
+            }
+          ]
+        },
+        "description": "Busca operadoras de saúde com base em um termo de busca"
+      },
+      "response": [
+        {
+          "name": "Busca por Unimed",
+          "originalRequest": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8002/api/search?query=unimed",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8002",
+              "path": [
+                "api",
+                "search"
+              ],
+              "query": [
+                {
+                  "key": "query",
+                  "value": "unimed"
+                }
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "content-type",
+              "value": "application/json"
+            }
+          ],
+          "cookie": [],
+          "body": "[\n    {\n        \"id\": \"123456\",\n        \"nome\": \"UNIMED EXEMPLO\",\n        \"razao_social\": \"UNIMED EXEMPLO COOPERATIVA DE TRABALHO MÉDICO\",\n        \"cnpj\": \"12.345.678/0001-90\",\n        \"modalidade\": \"Cooperativa Médica\",\n        \"porte\": \"Grande\",\n        \"uf\": \"SP\",\n        \"municipio\": \"São Paulo\"\n    }\n]"
+        }
+      ]
+    },
+    {
+      "name": "Buscar por Registro ANS",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8002/api/search?query=123456",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8002",
+          "path": [
+            "api",
+            "search"
+          ],
+          "query": [
+            {
+              "key": "query",
+              "value": "123456",
+              "description": "Número do registro ANS"
+            }
+          ]
+        },
+        "description": "Busca operadora pelo número do registro ANS"
+      }
+    },
+    {
+      "name": "Buscar por CNPJ",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8002/api/search?query=12345678000190",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8002",
+          "path": [
+            "api",
+            "search"
+          ],
+          "query": [
+            {
+              "key": "query",
+              "value": "12345678000190",
+              "description": "CNPJ da operadora (sem pontuação)"
+            }
+          ]
+        },
+        "description": "Busca operadora pelo CNPJ"
+      }
+    },
+    {
+      "name": "Buscar por Município",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8002/api/search?query=São Paulo",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8002",
+          "path": [
+            "api",
+            "search"
+          ],
+          "query": [
+            {
+              "key": "query",
+              "value": "São Paulo",
+              "description": "Nome do município"
+            }
+          ]
+        },
+        "description": "Busca operadoras por município"
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "searchQuery",
+      "value": "hospital",
+      "type": "string"
+    }
+  ]
+} 
