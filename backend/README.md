@@ -2,29 +2,6 @@
 
 Este projeto consiste em uma análise completa de dados da Agência Nacional de Saúde Suplementar (ANS), incluindo web scraping, transformação de dados e análise em banco de dados.
 
-## Estrutura do Projeto
-
-```
-.
-├── README.md
-├── requirements.txt
-├── web_scraping/
-│   ├── download_anexos.py
-│   └── anexos.zip
-├── transformacao/
-│   ├── extract_pdf.py
-│   └── Teste_[nome].zip
-└── banco_dados/
-    ├── importacao_dados.sql
-    ├── preprocess_csv.py
-    ├── relatorio_cadop_limpo.csv
-    └── demonstracoes/
-        └── 2023/
-            ├── 1T2023_limpo.csv
-            ├── 2T2023_limpo.csv
-            ├── 3T2023_limpo.csv
-            └── 4T2023_limpo.csv
-```
 
 ## Pré-requisitos
 
@@ -37,7 +14,8 @@ Este projeto consiste em uma análise completa de dados da Agência Nacional de 
 1. Clone o repositório:
 ```bash
 git clone [URL_DO_REPOSITORIO]
-cd [NOME_DO_DIRETORIO]
+cd [Test-Intuitive-Care]
+cd backend
 ```
 
 2. Instale as dependências Python:
@@ -80,15 +58,7 @@ Execute os seguintes comandos para baixar os dados necessários:
 
 ```bash
 # Criar diretórios
-mkdir -p demonstracoes/2023
-
-# Download dos dados cadastrais das operadoras ativas
-curl -o relatorio_cadop_limpo.csv https://dadosabertos.ans.gov.br/FTP/PDA/operadoras_de_plano_de_saude_ativas/relatorio_cadop_limpo.csv
-
-# Download das demonstrações contábeis de 2023
-for trimestre in 1T 2T 3T 4T; do
-    curl -o "demonstracoes/2023/${trimestre}2023_limpo.csv" "https://dadosabertos.ans.gov.br/FTP/PDA/demonstracoes_contabeis/${trimestre}2023_limpo.csv"
-done
+python testedb.py
 ```
 
 #### 3.2. Processamento dos Dados
@@ -101,10 +71,17 @@ python preprocess_csv.py
 
 #### 3.3. Importação para o Banco de Dados
 
-Execute o script SQL para criar as tabelas e importar os dados:
+Execute o script SQL para criar as tabelas :
 
 ```bash
-psql -U [seu_usuario] -d intuitive -f importacao_dados.sql
+psql -U [seu_usuario] -d [seu_banco] -f criar_tabelas.sql
+```
+#### 3.4. Importação para o Banco de Dados
+
+Execute o script SQL para importar as tabelas :
+
+```bash
+psql -U [seu_usuario] -d [seu_banco] -f importacao_dados.sql
 ```
 
 ### 4. Análise dos Dados
@@ -119,44 +96,19 @@ psql -U [seu_usuario] -d intuitive
 
 1. Top 10 operadoras com maiores despesas no último trimestre:
 ```sql
-WITH UltimoTrimestre AS (
-    SELECT 
-        dc.reg_ans,
-        oa.razao_social,
-        ABS(dc.vl_saldo_final) as despesa
-    FROM demonstracoes_contabeis dc
-    JOIN operadoras_ativas oa ON dc.reg_ans = oa.registro_ans::integer
-    WHERE dc.data >= '2023-10-01' 
-    AND dc.data <= '2023-12-31'
-    AND UPPER(dc.descricao) LIKE UPPER('%EVENTOS%SINISTROS%MEDICO HOSPITALAR%')
-)
-SELECT 
-    razao_social as "Operadora",
-    TO_CHAR(despesa, 'FM999,999,999,999.00') as "Despesa (R$)"
-FROM UltimoTrimestre
-ORDER BY despesa DESC
-LIMIT 10;
+
+# Para ver as maiores despesas do último trimestre
+
+```bash
+psql -U [seu_usuario] -d [seu_banco] -f consulta_trimestre.sql
 ```
 
 2. Top 10 operadoras com maiores despesas no ano:
 ```sql
-WITH DespesasAnuais AS (
-    SELECT 
-        dc.reg_ans,
-        oa.razao_social,
-        ABS(SUM(dc.vl_saldo_final)) as despesa_total
-    FROM demonstracoes_contabeis dc
-    JOIN operadoras_ativas oa ON dc.reg_ans = oa.registro_ans::integer
-    WHERE EXTRACT(YEAR FROM dc.data) = 2023
-    AND UPPER(dc.descricao) LIKE UPPER('%EVENTOS%SINISTROS%MEDICO HOSPITALAR%')
-    GROUP BY dc.reg_ans, oa.razao_social
-)
-SELECT 
-    razao_social as "Operadora",
-    TO_CHAR(despesa_total, 'FM999,999,999,999.00') as "Despesa Total 2023 (R$)"
-FROM DespesasAnuais
-ORDER BY despesa_total DESC
-LIMIT 10;
+
+# Para ver as maiores despesas do ano todo
+
+psql -U [seu_usuario] -d [seu_banco] -f consulta_anual.sql
 ```
 
 ## Estrutura do Banco de Dados
