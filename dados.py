@@ -1,58 +1,67 @@
-import requests
-from bs4 import BeautifulSoup
+import pdfplumber
+import pandas as pd
 import zipfile
 
-url = "https://www.gov.br/ans/pt-br/acesso-a-informacao/participacao-da-sociedade/atualizacao-do-rol-de-procedimentos"
-response = requests.get(url)
-if response.status_code != 200:
-    print("Erro ao acessar o site:", response.status_code)
-    exit()
+pdf = pdfplumber.open("anexo_I.pdf")
 
-soup = BeautifulSoup(response.content, 'html.parser')
+all_rows = []  
+header = None  
 
-anexo_i_link = None
-anexo_ii_link = None
+for page in pdf.pages[2:]:
+    tables = page.extract_tables()
+    if not tables:
+        continue  
 
-links = soup.find_all('a')
-for link in links:
-    href = link.get('href', '')
-    text = link.get_text(strip=True).lower()
-    
-    if "anexo i" in text and "anexo ii" not in text and href.endswith('.pdf'):
-        anexo_i_link = link
-    elif "anexo ii" in text and href.endswith('.pdf'):
-        anexo_ii_link = link
+    for table in tables:
+        if header is None:
+            header = [ (cell.strip() if cell else "") for cell in table[0] ]  
+            for row in table[1:]:
+                clean_row = [ (cell.strip() if cell else "") for cell in row ]
+                all_rows.append(clean_row)
+        else:
+            start_index = 0
+            first_row = [ (cell.strip() if cell else "") for cell in table[0] ]
+            if first_row == header:
+                start_index = 1
+            for row in table[start_index:]:
+                clean_row = [ (cell.strip() if cell else "") for cell in row ]
+                all_rows.append(clean_row)
 
-if not anexo_i_link or not anexo_ii_link:
-    print("Anexos não encontrados. Aqui estão todos os links encontrados na página:")
-    for link in links:
-        href = link.get('href', '')
-        text = link.get_text(strip=True)
-        if href:  # Exibe apenas links com href
-            print(f"Texto: {text}, URL: {href}")
-    exit()
+pdf.close()
 
-anexo_i_url = anexo_i_link['href']
-anexo_ii_url = anexo_ii_link['href']
+df = pd.DataFrame(all_rows, columns=header)
 
-base_url = "https://www.gov.br"
-anexo_i_url = anexo_i_url if anexo_i_url.startswith('http') else base_url + anexo_i_url
-anexo_ii_url = anexo_ii_url if anexo_ii_url.startswith('http') else base_url + anexo_ii_url
+df.dropna(how="all", inplace=True)
 
-print("Anexo I URL:", anexo_i_url)
-print("Anexo II URL:", anexo_ii_url)
+df.drop_duplicates(inplace=True)
 
-anexo_i_response = requests.get(anexo_i_url)
-anexo_ii_response = requests.get(anexo_ii_url)
+df.columns = [col.strip() for col in df.columns]
 
-with open('anexo_I.pdf', 'wb') as f:
-    f.write(anexo_i_response.content)
+col_rename_map = {
+    "OD": "Seg. Odontológica",
+    "AMB": "Seg. Ambulatorial",
+    "HCO": "Seg. Hospitalar Com Obstetrícia",
+    "HSO": "Seg. Hospitalar Sem Obstetrícia",
+    "REF": "Plano Referência",
+    "PAC": "Procedimento de Alta Complexidade",
+    "DUT": "Diretriz de Utilização"
+}
+new_columns = []
+for col in df.columns:
+    if col in col_rename_map:
+        new_columns.append(col_rename_map[col])
+    elif col.split(" ")[0] in col_rename_map:  
+        base = col.split(" ")[0]
+        new_name = col_rename_map.get(base, base)
+        suffix = col[len(base):]
+        new_columns.append(new_name + suffix)
+    else:
+        new_columns.append(col)
+df.columns = new_columns
 
-with open('anexo_II.pdf', 'wb') as f:
-    f.write(anexo_ii_response.content)
+csv_filename = "rol_procedimentos.csv"
+df.to_csv(csv_filename, index=False)
 
-with zipfile.ZipFile('anexos.zip', 'w') as zipf:
-    zipf.write('anexo_I.pdf')
-    zipf.write('anexo_II.pdf')
-
-print("Anexos baixados e compactados em 'anexos.zip' com sucesso!")
+zip_filename = "Teste_Jorge.zip"
+with zipfile.ZipFile(zip_filename, mode="w", compression=zipfile.ZIP_DEFLATED) as zipf:
+    zipf.write(csv_filename, arcname=csv_filename)
