@@ -13,7 +13,7 @@ Este projeto consiste em uma análise completa de dados da Agência Nacional de 
 
 1. Clone o repositório:
 ```bash
-git clone [URL_DO_REPOSITORIO]
+git clone [https://github.com/Jose6348/Test-Intuitive-Care.git]
 cd [Test-Intuitive-Care]
 cd backend
 ```
