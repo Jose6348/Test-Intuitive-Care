@@ -114,10 +114,8 @@ async def search_operators(query: str = None):
         raise HTTPException(status_code=500, detail="Erro ao carregar dados do CSV")
     
     try:
-        # Converte query para minúsculo para busca case-insensitive
         query = query.lower()
         
-        # Busca por múltiplos campos
         mask = (
             df['Razao_Social'].str.lower().str.contains(query, na=False) |
             df['Nome_Fantasia'].str.lower().str.contains(query, na=False) |
@@ -128,7 +126,6 @@ async def search_operators(query: str = None):
             df['UF'].str.lower().str.contains(query, na=False)
         )
         
-        # Filtrar resultados e calcular relevância
         results = df[mask].copy()
         print(f"Número de resultados encontrados: {len(results)}")
         
@@ -141,7 +138,6 @@ async def search_operators(query: str = None):
             results = []
             print("Nenhum resultado encontrado")
             
-        # Formatar os resultados
         formatted_results = []
         for result in results:
             formatted_results.append({

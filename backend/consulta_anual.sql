@@ -1,13 +1,10 @@
--- Configuração para melhor visualização no terminal
 \x auto
 \pset border 2
 \pset linestyle unicode
 \pset null '[NULL]'
 
--- Título da consulta
 \echo '\n=== TOP 10 OPERADORAS COM MAIORES DESPESAS EM SINISTROS (ANO 2023) ===\n'
 
--- Consulta para encontrar as 10 operadoras com maiores despesas em sinistros no ano de 2023
 SELECT 
     o.registro_ans as "Registro ANS",
     o.razao_social as "Razão Social",

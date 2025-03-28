@@ -1,4 +1,3 @@
--- Importar operadoras ativas (arquivo limpo)
 \copy operadoras_ativas (registro_ans, cnpj, razao_social, nome_fantasia, modalidade, logradouro, numero, complemento, bairro, cidade, uf, cep, ddd, telefone, fax, endereco_eletronico, representante, cargo_representante, data_registro_ans) FROM PROGRAM 'cut -d";" -f1-18,20 relatorio_cadop.csv | sed "s/\"//g"' WITH (FORMAT csv, HEADER true, ENCODING 'UTF8', DELIMITER ';', NULL '', QUOTE '"');
 
 -- Demonstrativos Contábeis 2023

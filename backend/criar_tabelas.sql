@@ -1,4 +1,3 @@
--- Criação da tabela de operadoras de plano de saúde ativas (Relatorio_cadop.csv)
 CREATE TABLE operadoras_ativas (
     registro_ans        INTEGER,
     cnpj                VARCHAR(18),
@@ -21,7 +20,6 @@ CREATE TABLE operadoras_ativas (
     data_registro_ans   DATE
 );
 
--- Criação da tabela de demonstrações contábeis trimestrais (arquivos 1T*.csv, 2T*.csv etc.)
 CREATE TABLE demonstracoes_contabeis (
     data                DATE,
     reg_ans             INTEGER,

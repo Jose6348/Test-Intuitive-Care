@@ -1,17 +1,14 @@
--- Configuração para melhor visualização no terminal
 \x auto
 \pset border 2
 \pset linestyle unicode
 \pset null '[NULL]'
 
--- Verificar datas disponíveis
 \echo '\n=== DATAS DISPONÍVEIS NA TABELA DEMONSTRAÇÕES CONTÁBEIS ===\n'
 SELECT DISTINCT data 
 FROM demonstracoes_contabeis 
 ORDER BY data DESC 
 LIMIT 5;
 
--- Verificar descrições de contas contábeis
 \echo '\n=== DESCRIÇÕES DE CONTAS CONTÁBEIS RELACIONADAS A SINISTROS ===\n'
 SELECT DISTINCT descricao 
 FROM demonstracoes_contabeis 
@@ -21,7 +18,6 @@ WHERE descricao ILIKE '%SINISTRO%'
 ORDER BY descricao 
 LIMIT 10;
 
--- Verificar se há dados para 2023
 \echo '\n=== AMOSTRA DE DADOS DE 2023 ===\n'
 SELECT 
     d.data,
