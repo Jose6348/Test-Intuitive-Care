@@ -39,25 +39,25 @@
         <div v-for="operator in results" :key="operator.registro_ans" class="operator-card">
           <div class="operator-header">
             <h4>{{ operator.nome_fantasia }}</h4>
-            <span class="operator-id">Registro ANS: {{ operator.registro_ans }}</span>
+            <span class="operator-id">Registro ANS: {{ operator.Registro_ANS}}</span>
           </div>
           
           <div class="operator-details">
             <div class="detail-item">
               <i class="fas fa-building"></i>
-              <span>{{ operator.razao_social }}</span>
+              <span>{{ operator.Razao_Social }}</span>
             </div>
             <div class="detail-item">
               <i class="fas fa-id-card"></i>
-              <span>{{ operator.cnpj }}</span>
+              <span>{{ operator.CNPJ }}</span>
             </div>
             <div class="detail-item">
               <i class="fas fa-hospital"></i>
-              <span>{{ operator.modalidade }}</span>
+              <span>{{ operator.Modalidade }}</span>
             </div>
             <div class="detail-item">
               <i class="fas fa-map-marker-alt"></i>
-              <span>{{ operator.cidade }} - {{ operator.uf }}</span>
+              <span>{{ operator.Cidade }} - {{ operator.UF}}</span>
             </div>
           </div>
         </div>

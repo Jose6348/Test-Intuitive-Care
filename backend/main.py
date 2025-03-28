@@ -36,7 +36,7 @@ def load_operators():
         files = os.listdir(current_dir)
         print(f"Arquivos no diretório: {files}")
         
-        csv_path = os.path.join(current_dir, 'relatorio_cadop_limpo_processed.csv')
+        csv_path = os.path.join(current_dir, 'relatorio_cadop.csv')
         print(f"Tentando abrir o arquivo: {csv_path}")
         
         if not os.path.exists(csv_path):
@@ -74,29 +74,29 @@ def calculate_relevance(row, query):
     query = query.lower()
     
     # Maior peso para correspondências exatas
-    if query == str(row['registro_ans']).lower():
+    if query == str(row['Registro_ANS']).lower():
         relevance += 100
-    if query == str(row['cnpj']).lower():
+    if query == str(row['CNPJ']).lower():
         relevance += 100
         
     # Peso alto para correspondências no início do texto
-    if str(row['nome_fantasia']).lower().startswith(query):
+    if str(row['Nome_Fantasia']).lower().startswith(query):
         relevance += 80
-    if str(row['razao_social']).lower().startswith(query):
+    if str(row['Razao_Social']).lower().startswith(query):
         relevance += 80
         
     # Peso médio para correspondências em qualquer parte
-    if query in str(row['nome_fantasia']).lower():
+    if query in str(row['Nome_Fantasia']).lower():
         relevance += 60
-    if query in str(row['razao_social']).lower():
+    if query in str(row['Razao_Social']).lower():
         relevance += 60
         
     # Peso menor para correspondências em outros campos
-    if query in str(row['modalidade']).lower():
+    if query in str(row['Modalidade']).lower():
         relevance += 40
-    if query in str(row['cidade']).lower():
+    if query in str(row['Cidade']).lower():
         relevance += 30
-    if query in str(row['uf']).lower():
+    if query in str(row['UF']).lower():
         relevance += 20
         
     return relevance
@@ -119,13 +119,13 @@ async def search_operators(query: str = None):
         
         # Busca por múltiplos campos
         mask = (
-            df['razao_social'].str.lower().str.contains(query, na=False) |
-            df['nome_fantasia'].str.lower().str.contains(query, na=False) |
-            df['registro_ans'].astype(str).str.lower().str.contains(query, na=False) |
-            df['cnpj'].astype(str).str.lower().str.contains(query, na=False) |
-            df['modalidade'].str.lower().str.contains(query, na=False) |
-            df['cidade'].str.lower().str.contains(query, na=False) |
-            df['uf'].str.lower().str.contains(query, na=False)
+            df['Razao_Social'].str.lower().str.contains(query, na=False) |
+            df['Nome_Fantasia'].str.lower().str.contains(query, na=False) |
+            df['Registro_ANS'].astype(str).str.lower().str.contains(query, na=False) |
+            df['CNPJ'].astype(str).str.lower().str.contains(query, na=False) |
+            df['Modalidade'].str.lower().str.contains(query, na=False) |
+            df['Cidade'].str.lower().str.contains(query, na=False) |
+            df['UF'].str.lower().str.contains(query, na=False)
         )
         
         # Filtrar resultados e calcular relevância
@@ -134,7 +134,7 @@ async def search_operators(query: str = None):
         
         if len(results) > 0:
             results['relevance'] = results.apply(lambda row: calculate_relevance(row, query), axis=1)
-            results = results.sort_values('relevance', ascending=False).head(10)
+            results = results.sort_values('relevance', ascending=False)
             results = results.to_dict('records')
             print(f"Top 10 resultados mais relevantes selecionados")
         else:
@@ -145,14 +145,14 @@ async def search_operators(query: str = None):
         formatted_results = []
         for result in results:
             formatted_results.append({
-                'id': clean_nan(result['registro_ans']),
-                'nome': clean_nan(result['nome_fantasia']) or clean_nan(result['razao_social']),
-                'razao_social': clean_nan(result['razao_social']),
-                'cnpj': clean_nan(result['cnpj']),
-                'modalidade': clean_nan(result['modalidade']),
+                'id': clean_nan(result['Registro_ANS']),
+                'nome': clean_nan(result['Nome_Fantasia']) or clean_nan(result['Razao_Social']),
+                'Razao_Social': clean_nan(result['Razao_Social']),
+                'CNPJ': clean_nan(result['CNPJ']),
+                'Modalidade': clean_nan(result['Modalidade']),
                 'porte': clean_nan(result.get('porte', '')),
-                'uf': clean_nan(result['uf']),
-                'municipio': clean_nan(result['cidade'])
+                'UF': clean_nan(result['UF']),
+                'municipio': clean_nan(result['Cidade'])
             })
         
         return formatted_results
